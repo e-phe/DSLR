@@ -58,6 +58,21 @@ def min(data, i):
 			min = float(data[j, i - 1])
 	return min
 
+def median(data, i):
+	if i == 0:
+		return "50%"
+	if count(data, i) == 0:
+		return "NaN"
+	tab = []
+	for j in range(1, len(data[:, 0])):
+		if data[j, i - 1] != "":
+			tab.append(float(data[j, i - 1]))
+	tab.sort()
+	half = int(len(tab) / 2)
+	if not len(tab) % 2:
+		return (tab[half - 1] + tab[half]) / 2
+	return tab[half]
+
 def max(data, i):
 	if i == 0:
 		return "Max"
@@ -98,9 +113,9 @@ if __name__ == "__main__":
 		3: std,
 		4: min,
 		# 5: twentyFive,
-		# 6: fifty,
+		5: median,
 		# 7: seventyFive,
-		5: max,
+		6: max,
 	}
 	describe = np.zeros([len(options) + 1, len(data[0]) + 1], dtype="<U1000")
 	describe[0, 1:] = data[0]
