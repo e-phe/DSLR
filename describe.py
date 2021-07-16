@@ -3,10 +3,34 @@
 
 import numpy as np
 import os
-import pandas as pd
 import re
+import sys
 
-def count(data, i):
+def printDescribe(describe, printLen):
+	printDescribe = ""
+	for j in range(0, len(describe[:, 0])):
+		for i in range(0, len(describe[0])):
+			if i == 0:
+				printDescribe += describe[j, i].ljust(int(printLen[i]))
+			else:
+				if re.search("^[+-]?([0-9]+[.])?[0-9]+$", describe[j, i]) == None:
+					printDescribe += describe[j, i].rjust(int(printLen[i]))
+				else:
+					printDescribe += str("%.6f" % float(describe[j, i])).rjust(int(printLen[i]))
+			printDescribe += "  "
+		printDescribe += '\n'
+	print(printDescribe[:-1])
+
+def maxLen(describe, i):
+	max = float('-inf')
+	for j in range(0, len(describe[:, i])):
+		if re.search("^[+-]?([0-9]+[.])?[0-9]+$", describe[j, i]) == None and len(describe[j, i]) > max:
+			max = len(describe[j, i])
+		elif re.search("^[+-]?([0-9]+[.])?[0-9]+$", describe[j, i]) != None and len("%.6f" % float(describe[j, i])) > max:
+			max = len("%.6f" % float(describe[j, i]))
+	return max
+
+def ft_count(data, i):
 	if i == 0:
 		return "Count"
 	count = 0
@@ -15,18 +39,18 @@ def count(data, i):
 			count += 1
 	return count
 
-def mean(data, i):
+def ft_mean(data, i):
 	if i == 0:
 		return "Mean"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	sum = 0
 	for j in range(1, len(data[:, i - 1])):
 		if data[j, i - 1] != "":
 			sum += float(data[j, i - 1])
-	return sum / count(data, i)
+	return sum / ft_count(data, i)
 
-def sqrt(nb):
+def ft_sqrt(nb):
 	diff = 1
 	a = nb
 	if nb <= 0:
@@ -37,22 +61,22 @@ def sqrt(nb):
 		a = b
 	return a
 
-def std(data, i):
+def ft_std(data, i):
 	if i == 0:
 		return "Std"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	std = 0
-	m = mean(data, i)
+	m = ft_mean(data, i)
 	for j in range(1, len(data[:, i - 1])):
 		if data[j, i - 1] != "":
 			std += (float(data[j, i - 1]) - m) * (float(data[j, i - 1]) - m)
-	return sqrt(std / (count(data, i) - 1))
+	return ft_sqrt(std / (ft_count(data, i) - 1))
 
-def min(data, i):
+def ft_min(data, i):
 	if i == 0:
 		return"Min"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	min = float('inf')
 	for j in range(1, len(data[:, i - 1])):
@@ -60,10 +84,10 @@ def min(data, i):
 			min = float(data[j, i - 1])
 	return min
 
-def firstQuartile(data, i):
+def ft_firstQuartile(data, i):
 	if i == 0:
 		return "25%"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
 	for j in range(1, len(data[:, i - 1])):
@@ -77,10 +101,10 @@ def firstQuartile(data, i):
 		return tab[int(quarter)]
 	return tab[int(down)] * (up - quarter) + tab[int(up)] * (quarter - down)
 
-def median(data, i):
+def ft_median(data, i):
 	if i == 0:
 		return "50%"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
 	for j in range(1, len(data[:, i - 1])):
@@ -92,10 +116,10 @@ def median(data, i):
 		return tab[half]
 	return (tab[half - 1] + tab[half]) / 2
 
-def thirdQuartile(data, i):
+def ft_thirdQuartile(data, i):
 	if i == 0:
 		return "75%"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
 	for j in range(1, len(data[:, i - 1])):
@@ -109,10 +133,10 @@ def thirdQuartile(data, i):
 		return tab[int(quarter)]
 	return tab[int(down)] * (up - quarter) + tab[int(up)] * (quarter - down)
 
-def max(data, i):
+def ft_max(data, i):
 	if i == 0:
 		return "Max"
-	if count(data, i) == 0:
+	if ft_count(data, i) == 0:
 		return "NaN"
 	max = float('-inf')
 	for j in range(1, len(data[:, i - 1])):
@@ -120,17 +144,16 @@ def max(data, i):
 			max = float(data[j, i - 1])
 	return max
 
-def delColumn(data, i):
+def delCoLette(data, i):
 	for j in range(1, len(data[:, i - 1])):
-		if data[j, i] != "" and (re.search("[+-]?([0-9]+[.])?[0-9]+", data[j, i]) == None or
-		len(re.findall("[+-]?([0-9]+[.])?[0-9]+", data[j, i])) != 1):
+		if data[j, i] != "" and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None:
 			return [np.delete(data, i, 1), i]
 	return [data, i + 1]
 
 def checkError():
 	try:
-		if (os.path.isfile("datasets/dataset_test.csv") and os.stat("datasets/dataset_test.csv").st_size > 0):
-			data = np.loadtxt("datasets/dataset_test.csv", dtype = str, delimiter = ",")
+		if (os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0):
+			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
 			if (len(data[:, 0]) >= 2):
 				return data
 	except:
@@ -139,27 +162,27 @@ def checkError():
 	exit(1)
 
 if __name__ == "__main__":
-	df = pd.read_csv("datasets/dataset_test.csv")
-	# print(df.describe())
+	if len(sys.argv) < 2:
+		exit(1)
 	data = checkError()
 	i = 0
 	while i < len(data[0]):
-		[data, i] = delColumn(data, i)
+		[data, i] = delCoLette(data, i)
 	options = {
-		1: count,
-		2: mean,
-		3: std,
-		4: min,
-		5: firstQuartile,
-		6: median,
-		7: thirdQuartile,
-		8: max,
+		1: ft_count,
+		2: ft_mean,
+		3: ft_std,
+		4: ft_min,
+		5: ft_firstQuartile,
+		6: ft_median,
+		7: ft_thirdQuartile,
+		8: ft_max,
 	}
 	describe = np.zeros([len(options) + 1, len(data[0]) + 1], dtype="<U1000")
 	describe[0, 1:] = data[0]
-	i = 0
-	while i < len(describe[0]):
+	printLen = np.zeros(len(describe[0]), dtype="<U1000")
+	for i in range(0, len(describe[0])):
 		for j in range(1, len(describe[:, 0])):
-			describe[j, i] = options[j](data, i)
-		i += 1
-	# print(describe)
+				describe[j, i] = options[j](data, i)
+		printLen[i] = maxLen(describe, i)
+	printDescribe(describe, printLen)
