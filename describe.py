@@ -152,7 +152,7 @@ def delCoLette(data, i):
 
 def checkError():
 	try:
-		if (os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0):
+		if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0:
 			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
 			if (len(data[:, 0]) >= 2):
 				return data
@@ -162,8 +162,6 @@ def checkError():
 	exit(1)
 
 if __name__ == "__main__":
-	if len(sys.argv) < 2:
-		exit(1)
 	data = checkError()
 	i = 0
 	while i < len(data[0]):
@@ -183,6 +181,6 @@ if __name__ == "__main__":
 	printLen = np.zeros(len(describe[0]), dtype="<U1000")
 	for i in range(0, len(describe[0])):
 		for j in range(1, len(describe[:, 0])):
-				describe[j, i] = options[j](data, i)
+			describe[j, i] = options[j](data, i)
 		printLen[i] = maxLen(describe, i)
 	printDescribe(describe, printLen)
