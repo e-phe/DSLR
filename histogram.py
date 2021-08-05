@@ -7,63 +7,27 @@ import os
 import re
 import sys
 
-def hist(data, gryffindor, hufflepuff, ravenclaw, slytherin):
-	for i in range(0, len(data[0])):
-		plt.hist(gryffindor[:, i], color='red', bins=25, alpha=0.5)
-		plt.hist(hufflepuff[:, i], color='yellow', bins=25, alpha=0.5)
-		plt.hist(ravenclaw[:, i], color='blue', bins=25, alpha=0.5)
-		plt.hist(slytherin[:, i], color='green', bins=25, alpha=0.5)
-		plt.legend(['Grynffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'], loc='upper right', frameon=False)
+def histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin):
+	for i in range(len(data[0])):
+		plt.hist(gryffindor[:, i], label = "Grynffindor", color = "red", alpha = 0.5)
+		plt.hist(hufflepuff[:, i], label = "Hufflepuff", color = "yellow", alpha = 0.5)
+		plt.hist(ravenclaw[:, i], label = "Ravenclaw", color = "blue", alpha = 0.5)
+		plt.hist(slytherin[:, i], label = "Slytherin", color = "green", alpha = 0.5)
+		plt.legend(loc = "upper right", frameon = False)
 		plt.title(data[0, i])
-		plt.xlabel('Grades')
-		plt.ylabel('Number of student')
+		plt.xlabel("Grades")
+		plt.ylabel("Number of student")
 		plt.show()
 
-def ft_count(data, i):
-	count = 0
-	for j in range(1, len(data[:, i])):
-		if data[j, i] != "":
-			count += 1
-	return count
-
-def ft_mean(data, i):
-	sum = 0
-	for j in range(1, len(data[:, i])):
-		if data[j, i] != "":
-			sum += float(data[j, i])
-	return sum / ft_count(data, i)
-
-def ft_sqrt(nb):
-	diff = 1
-	a = nb
-	if nb <= 0:
-		return 0
-	while diff > 0.001:
-		b = 0.5 * (a + nb / a)
-		diff = a - b
-		a = b
-	return a
-
-def ft_std(data, i):
-	std = 0
-	m = ft_mean(data, i)
-	for j in range(1, len(data[:, i])):
-		if data[j, i] != "":
-			std += (float(data[j, i]) - m) * (float(data[j, i]) - m)
-	return ft_sqrt(std / (ft_count(data, i) - 1))
-
-def standardization(data, house):
-	ret = np.zeros([len(house), len(house[0])], dtype="float")
-	for i in range(0, len(data[0])):
-		mean = ft_mean(data, i)
-		std = ft_std(data, i)
-		for j in range(1, len(house[:, i])):
-			if house[j, i] != "":
-				ret[j, i] = (float(house[j, i]) - mean) / std
+def convertFloat(house):
+	ret = np.zeros([len(house), len(house[0])])
+	for i in range(len(house[0])):
+		for j in range(len(house)):
+			ret[j, i] = float(house[j, i]) if house[j, i] != "" else np.NaN
 	return ret
 
 def delCoLette(data, i):
-	for j in range(1, len(data[:, i])):
+	for j in range(1, len(data)):
 		if data[j, i] != "" and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None:
 			return [np.delete(data, i, 1), i]
 	return [data, i + 1]
@@ -80,7 +44,7 @@ def parseHouse(data):
 	hufflepuff = np.zeros([0, len(data[0])])
 	ravenclaw = np.zeros([0, len(data[0])])
 	slytherin = np.zeros([0, len(data[0])])
-	for i in range(0, len(data[:, 0])):
+	for i in range(len(data)):
 		if data[i, 1] == "Gryffindor":
 			gryffindor = np.append(gryffindor, np.array([data[i, :]]), axis=0)
 		elif data[i, 1] == "Hufflepuff":
@@ -94,11 +58,11 @@ def parseHouse(data):
 	hufflepuff = removeLetter(hufflepuff)
 	ravenclaw = removeLetter(ravenclaw)
 	slytherin = removeLetter(slytherin)
-	gryffindor = standardization(data, gryffindor)
-	hufflepuff = standardization(data, hufflepuff)
-	ravenclaw = standardization(data, ravenclaw)
-	slytherin = standardization(data, slytherin)
-	hist(data, gryffindor, hufflepuff, ravenclaw, slytherin)
+	gryffindor = convertFloat(gryffindor)
+	hufflepuff = convertFloat(hufflepuff)
+	ravenclaw = convertFloat(ravenclaw)
+	slytherin = convertFloat(slytherin)
+	return [data, gryffindor, hufflepuff, ravenclaw, slytherin]
 
 def checkError():
 	try:
@@ -113,4 +77,5 @@ def checkError():
 
 if __name__ == "__main__":
 	data = checkError()
-	parseHouse(data)
+	[data, gryffindor, hufflepuff, ravenclaw, slytherin] = parseHouse(data)
+	histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin)
