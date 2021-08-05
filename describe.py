@@ -8,8 +8,8 @@ import sys
 
 def printDescribe(describe, printLen):
 	printDescribe = ""
-	for j in range(0, len(describe[:, 0])):
-		for i in range(0, len(describe[0])):
+	for j in range(len(describe)):
+		for i in range(len(describe[0])):
 			if i == 0:
 				printDescribe += describe[j, i].ljust(int(printLen[i]))
 			else:
@@ -18,12 +18,12 @@ def printDescribe(describe, printLen):
 				else:
 					printDescribe += str("%.6f" % float(describe[j, i])).rjust(int(printLen[i]))
 			printDescribe += "  "
-		printDescribe += '\n'
+		printDescribe += "\n"
 	print(printDescribe[:-1])
 
 def maxLen(describe, i):
-	max = float('-inf')
-	for j in range(0, len(describe[:, i])):
+	max = float("-inf")
+	for j in range(len(describe)):
 		if re.search("^[+-]?([0-9]+[.])?[0-9]+$", describe[j, i]) == None and len(describe[j, i]) > max:
 			max = len(describe[j, i])
 		elif re.search("^[+-]?([0-9]+[.])?[0-9]+$", describe[j, i]) != None and len("%.6f" % float(describe[j, i])) > max:
@@ -34,7 +34,7 @@ def ft_count(data, i):
 	if i == 0:
 		return "Count"
 	count = 0
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			count += 1
 	return count
@@ -45,7 +45,7 @@ def ft_mean(data, i):
 	if ft_count(data, i) == 0:
 		return "NaN"
 	sum = 0
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			sum += float(data[j, i - 1])
 	return sum / ft_count(data, i)
@@ -68,7 +68,7 @@ def ft_std(data, i):
 		return "NaN"
 	std = 0
 	m = ft_mean(data, i)
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			std += (float(data[j, i - 1]) - m) * (float(data[j, i - 1]) - m)
 	return ft_sqrt(std / (ft_count(data, i) - 1))
@@ -78,8 +78,8 @@ def ft_min(data, i):
 		return"Min"
 	if ft_count(data, i) == 0:
 		return "NaN"
-	min = float('inf')
-	for j in range(1, len(data[:, i - 1])):
+	min = float("inf")
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "" and float(data[j, i - 1]) < min:
 			min = float(data[j, i - 1])
 	return min
@@ -90,7 +90,7 @@ def ft_firstQuartile(data, i):
 	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			tab.append(float(data[j, i - 1]))
 	tab.sort()
@@ -107,7 +107,7 @@ def ft_median(data, i):
 	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			tab.append(float(data[j, i - 1]))
 	tab.sort()
@@ -122,7 +122,7 @@ def ft_thirdQuartile(data, i):
 	if ft_count(data, i) == 0:
 		return "NaN"
 	tab = []
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "":
 			tab.append(float(data[j, i - 1]))
 	tab.sort()
@@ -138,14 +138,14 @@ def ft_max(data, i):
 		return "Max"
 	if ft_count(data, i) == 0:
 		return "NaN"
-	max = float('-inf')
-	for j in range(1, len(data[:, i - 1])):
+	max = float("-inf")
+	for j in range(1, len(data)):
 		if data[j, i - 1] != "" and float(data[j, i - 1]) > max:
 			max = float(data[j, i - 1])
 	return max
 
 def delCoLette(data, i):
-	for j in range(1, len(data[:, i - 1])):
+	for j in range(1, len(data)):
 		if data[j, i] != "" and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None:
 			return [np.delete(data, i, 1), i]
 	return [data, i + 1]
@@ -154,7 +154,7 @@ def checkError():
 	try:
 		if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0:
 			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
-			if (len(data[:, 0]) >= 2):
+			if (len(data) >= 2):
 				return data
 	except:
 		pass
@@ -176,11 +176,11 @@ if __name__ == "__main__":
 		7: ft_thirdQuartile,
 		8: ft_max,
 	}
-	describe = np.zeros([len(options) + 1, len(data[0]) + 1], dtype="<U1000")
+	describe = np.zeros([len(options) + 1, len(data[0]) + 1], dtype = "<U1000")
 	describe[0, 1:] = data[0]
-	printLen = np.zeros(len(describe[0]), dtype="<U1000")
-	for i in range(0, len(describe[0])):
-		for j in range(1, len(describe[:, 0])):
+	printLen = np.zeros(len(describe[0]), dtype = "<U1000")
+	for i in range(len(describe[0])):
+		for j in range(1, len(describe)):
 			describe[j, i] = options[j](data, i)
 		printLen[i] = maxLen(describe, i)
 	printDescribe(describe, printLen)
