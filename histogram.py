@@ -19,16 +19,9 @@ def histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin):
 		plt.ylabel("Number of student")
 		plt.show()
 
-def convertFloat(house):
-	ret = np.zeros([len(house), len(house[0])])
-	for i in range(len(house[0])):
-		for j in range(len(house)):
-			ret[j, i] = float(house[j, i]) if house[j, i] != "" else np.NaN
-	return ret
-
 def delCoLette(data, i):
 	for j in range(1, len(data)):
-		if data[j, i] != "" and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None:
+		if data[j, i] != str(np.nan) and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None:
 			return [np.delete(data, i, 1), i]
 	return [data, i + 1]
 
@@ -40,6 +33,7 @@ def removeLetter(house):
 	return house
 
 def parseHouse(data):
+	data[data == ''] = np.nan
 	gryffindor = np.zeros([0, len(data[0])])
 	hufflepuff = np.zeros([0, len(data[0])])
 	ravenclaw = np.zeros([0, len(data[0])])
@@ -58,10 +52,10 @@ def parseHouse(data):
 	hufflepuff = removeLetter(hufflepuff)
 	ravenclaw = removeLetter(ravenclaw)
 	slytherin = removeLetter(slytherin)
-	gryffindor = convertFloat(gryffindor)
-	hufflepuff = convertFloat(hufflepuff)
-	ravenclaw = convertFloat(ravenclaw)
-	slytherin = convertFloat(slytherin)
+	gryffindor = gryffindor.astype(float)
+	hufflepuff = hufflepuff.astype(float)
+	ravenclaw = ravenclaw.astype(float)
+	slytherin = slytherin.astype(float)
 	return [data, gryffindor, hufflepuff, ravenclaw, slytherin]
 
 def checkError():
