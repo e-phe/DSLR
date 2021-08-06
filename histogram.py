@@ -34,19 +34,10 @@ def removeLetter(house):
 
 def parseHouse(data):
 	data[data == ''] = np.nan
-	gryffindor = np.zeros([0, len(data[0])])
-	hufflepuff = np.zeros([0, len(data[0])])
-	ravenclaw = np.zeros([0, len(data[0])])
-	slytherin = np.zeros([0, len(data[0])])
-	for i in range(len(data)):
-		if data[i, 1] == "Gryffindor":
-			gryffindor = np.append(gryffindor, np.array([data[i, :]]), axis=0)
-		elif data[i, 1] == "Hufflepuff":
-			hufflepuff = np.append(hufflepuff, np.array([data[i, :]]), axis=0)
-		elif data[i, 1] == "Ravenclaw":
-			ravenclaw = np.append(ravenclaw, np.array([data[i, :]]), axis=0)
-		elif data[i, 1] == "Slytherin":
-			slytherin = np.append(slytherin, np.array([data[i, :]]), axis=0)
+	gryffindor = data[np.where(data[:, 1] == "Gryffindor")]
+	hufflepuff = data[np.where(data[:, 1] == "Hufflepuff")]
+	ravenclaw = data[np.where(data[:, 1] == "Ravenclaw")]
+	slytherin = data[np.where(data[:, 1] == "Slytherin")]
 	data = removeLetter(data)
 	gryffindor = removeLetter(gryffindor)
 	hufflepuff = removeLetter(hufflepuff)
