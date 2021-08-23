@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import os
 import re
 import sys
 
@@ -150,19 +149,11 @@ def delCoLette(data, i):
 			return [np.delete(data, i, 1), i]
 	return [data, i + 1]
 
-def checkError():
-	try:
-		if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0:
-			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
-			if (len(data) >= 2):
-				return data
-	except:
-		pass
-	print("Error")
-	exit(1)
-
 if __name__ == "__main__":
-	data = checkError()
+	try:
+		data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
+	except:
+		sys.exit("Error")
 	i = 0
 	while i < len(data[0]):
 		[data, i] = delCoLette(data, i)
