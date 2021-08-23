@@ -3,21 +3,19 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import re
 import sys
 
 def histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin):
-	for i in range(len(data[0])):
-		plt.hist(gryffindor[:, i], label = "Grynffindor", color = "red", alpha = 0.5)
-		plt.hist(hufflepuff[:, i], label = "Hufflepuff", color = "yellow", alpha = 0.5)
-		plt.hist(ravenclaw[:, i], label = "Ravenclaw", color = "blue", alpha = 0.5)
-		plt.hist(slytherin[:, i], label = "Slytherin", color = "green", alpha = 0.5)
-		plt.legend(loc = "upper right", frameon = False)
-		plt.title(data[0, i])
-		plt.xlabel("Grades")
-		plt.ylabel("Number of student")
-		plt.show()
+	plt.hist(gryffindor[:, 10], label = "Grynffindor", color = "red", alpha = 0.5)
+	plt.hist(hufflepuff[:, 10], label = "Hufflepuff", color = "yellow", alpha = 0.5)
+	plt.hist(ravenclaw[:, 10], label = "Ravenclaw", color = "blue", alpha = 0.5)
+	plt.hist(slytherin[:, 10], label = "Slytherin", color = "green", alpha = 0.5)
+	plt.legend(loc = "upper right", frameon = False)
+	plt.title(data[0, 10])
+	plt.xlabel("Grades")
+	plt.ylabel("Number of student")
+	plt.show()
 
 def delCoLette(data, i):
 	for j in range(1, len(data)):
@@ -49,18 +47,10 @@ def parseHouse(data):
 	slytherin = slytherin.astype(float)
 	return [data, gryffindor, hufflepuff, ravenclaw, slytherin]
 
-def checkError():
-	try:
-		if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]) and os.stat(sys.argv[1]).st_size > 0:
-			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
-			if (len(data[:, 0]) >= 2):
-				return data
-	except:
-		pass
-	print("Error")
-	exit(1)
-
 if __name__ == "__main__":
-	data = checkError()
+	try:
+		data = np.loadtxt("datasets/dataset_train.csv", dtype = str, delimiter = ",")
+	except:
+		sys.exit("Error")
 	[data, gryffindor, hufflepuff, ravenclaw, slytherin] = parseHouse(data)
 	histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin)
