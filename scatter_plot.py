@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import re
 import sys
 
@@ -37,7 +38,10 @@ def delCoLette(data, i):
 
 if __name__ == "__main__":
 	try:
-		data = np.loadtxt("datasets/dataset_train.csv", dtype = str, delimiter = ",")
+		if os.stat("datasets/dataset_train.csv").st_size > 0:
+			data = np.loadtxt("datasets/dataset_train.csv", dtype = str, delimiter = ",")
+		else:
+			sys.exit("Error")
 	except:
 		sys.exit("Error")
 	data = np.delete(data, 0, 1)

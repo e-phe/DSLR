@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import os
 import re
 import sys
 
@@ -151,7 +152,10 @@ def delCoLette(data, i):
 
 if __name__ == "__main__":
 	try:
-		data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
+		if os.stat(sys.argv[1]).st_size > 0:
+			data = np.loadtxt(sys.argv[1], dtype = str, delimiter = ",")
+		else:
+			sys.exit("Error")
 	except:
 		sys.exit("Error")
 	i = 0

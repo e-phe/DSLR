@@ -3,16 +3,18 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import re
 import sys
 
 def histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin):
-	plt.hist(gryffindor[:, 10], label = "Grynffindor", color = "red", alpha = 0.5)
-	plt.hist(hufflepuff[:, 10], label = "Hufflepuff", color = "yellow", alpha = 0.5)
-	plt.hist(ravenclaw[:, 10], label = "Ravenclaw", color = "blue", alpha = 0.5)
-	plt.hist(slytherin[:, 10], label = "Slytherin", color = "green", alpha = 0.5)
+	i = 10
+	plt.hist(gryffindor[:, i], label = "Grynffindor", color = "red", alpha = 0.5)
+	plt.hist(hufflepuff[:, i], label = "Hufflepuff", color = "yellow", alpha = 0.5)
+	plt.hist(ravenclaw[:, i], label = "Ravenclaw", color = "blue", alpha = 0.5)
+	plt.hist(slytherin[:, i], label = "Slytherin", color = "green", alpha = 0.5)
 	plt.legend(loc = "upper right", frameon = False)
-	plt.title(data[0, 10])
+	plt.title(data[0, i])
 	plt.xlabel("Grades")
 	plt.ylabel("Number of student")
 	plt.show()
@@ -49,7 +51,10 @@ def parseHouse(data):
 
 if __name__ == "__main__":
 	try:
-		data = np.loadtxt("datasets/dataset_train.csv", dtype = str, delimiter = ",")
+		if os.stat("datasets/dataset_train.csv").st_size > 0:
+			data = np.loadtxt("datasets/dataset_train.csv", dtype = str, delimiter = ",")
+		else:
+			sys.exit("Error")
 	except:
 		sys.exit("Error")
 	[data, gryffindor, hufflepuff, ravenclaw, slytherin] = parseHouse(data)
