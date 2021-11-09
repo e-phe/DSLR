@@ -5,13 +5,18 @@ import numpy as np
 import pandas as pd
 import sys
 
-def gradientDescent(X, h, theta, y):
-	gradient = np.dot(np.transpose(X), (h - y))
-	theta -= 0.0001 * (1 / len(y)) * gradient
-	return theta
-
 def sigmoid(x):
 	return 1 / (1 + np.exp(-x))
+
+def gradientDescent(X, y, theta):
+	alpha = 0.1
+	m = len(y)
+	for i in range(0, 20000):
+		z = np.dot(X, theta)
+		h = sigmoid(z)
+		gradient = np.dot(np.transpose(X), (h - y))
+		theta -= (alpha / m) * gradient
+	return theta
 
 def sqrt(nb):
 	diff = 1
@@ -30,7 +35,6 @@ def standardization(data):
 	for number in data:
 		std += (number - mean) * (number - mean)
 	std = sqrt(std / len(data))
-
 	for i in range(len(data)):
 		data[i] = (data[i] - mean) / std
 	return data
@@ -39,13 +43,8 @@ def fit(X, y):
 	np.apply_along_axis(standardization, 0, X)
 	theta = []
 	for i in np.unique(y):
-		binouse = np.where(y == i, 1, 0)
-		tmpTheta = np.zeros(X.shape[1])
-		for _ in range(30000):
-			z = np.dot(X, tmpTheta)
-			h = sigmoid(z)
-			tmpTheta = gradientDescent(X, h, tmpTheta, binouse)
-		theta.append((tmpTheta, i))
+		tmpTheta = gradientDescent(X, np.where(y == i, 1, 0), np.zeros(X.shape[1]))
+		theta.append((i, tmpTheta))
 	return theta
 
 if __name__ == "__main__":
@@ -57,3 +56,4 @@ if __name__ == "__main__":
 		sys.exit("Error")
 	df = df.dropna()
 	theta = fit(np.array(df.iloc[:,5:]), np.array(df.loc[:,"Hogwarts House"]))
+	pd.DataFrame(theta,).to_csv("theta.csv", index=False)
