@@ -56,4 +56,4 @@ if __name__ == "__main__":
 		sys.exit("Error")
 	df = df.dropna()
 	theta = fit(np.array(df.iloc[:,5:]), np.array(df.loc[:,"Hogwarts House"]))
-	pd.DataFrame(theta,).to_csv("theta.csv", index=False)
+	pd.DataFrame(theta).to_csv("theta.csv", index=False)
