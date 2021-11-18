@@ -166,17 +166,17 @@ def ft_max(df, i):
 
 
 def parse():
-    parse = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description="Descriptive statistics include those that summarize the central tendency, dispersion and shape of a dataset’s distribution, excluding NaN values.",
     )
-    parse.add_argument(
+    parser.add_argument(
         "-d",
         "--describe",
         action="store_true",
         help="display also describe from pandas",
     )
-    parse.add_argument("dataset.csv", help="data to analyse")
-    args = parse.parse_args()
+    parser.add_argument("dataset.csv", help="data to analyse")
+    args = parser.parse_args()
     try:
         df = pd.read_csv(sys.argv[1])
     except:
