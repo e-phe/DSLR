@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 # -*- coding: utf-8 -*-
 
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -46,6 +47,14 @@ def parseHouse(data):
     ravenclaw = data[np.where(data[:, 1] == "Ravenclaw")]
     slytherin = data[np.where(data[:, 1] == "Slytherin")]
     data = removeLetter(data)
+    if (
+        data.size == 0
+        or gryffindor.size == 0
+        or hufflepuff.size == 0
+        or ravenclaw.size == 0
+        or slytherin.size == 0
+    ):
+        sys.exit("Error")
     gryffindor = removeLetter(gryffindor)
     hufflepuff = removeLetter(hufflepuff)
     ravenclaw = removeLetter(ravenclaw)
@@ -57,13 +66,23 @@ def parseHouse(data):
     return [data, gryffindor, hufflepuff, ravenclaw, slytherin]
 
 
-if __name__ == "__main__":
+def parse():
+    parser = argparse.ArgumentParser(
+        description="Create a histogram that help answer the following question : which Hogwarts class has an homogenous grade repartition between the four houses?",
+    )
+    parser.add_argument("dataset_train.csv", help="dataset to use")
+    args = parser.parse_args()
     try:
-        if os.stat("datasets/dataset_train.csv").st_size > 0:
-            data = np.loadtxt("datasets/dataset_train.csv", dtype=str, delimiter=",")
+        if os.stat(sys.argv[1]).st_size > 0:
+            data = np.loadtxt(sys.argv[1], dtype=str, delimiter=",")
         else:
             sys.exit("Error")
     except:
         sys.exit("Error")
+    return data
+
+
+if __name__ == "__main__":
+    data = parse()
     [data, gryffindor, hufflepuff, ravenclaw, slytherin] = parseHouse(data)
     histogram(data, gryffindor, hufflepuff, ravenclaw, slytherin)
