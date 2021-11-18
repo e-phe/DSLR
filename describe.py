@@ -1,8 +1,9 @@
 #!/usr/bin/env python3.8
 # -*- coding: utf-8 -*-
 
+import argparse
 import numpy as np
-import os
+import pandas as pd
 import re
 import sys
 
@@ -41,26 +42,26 @@ def maxLen(describe, i):
     return max
 
 
-def ft_count(data, i):
+def ft_count(df, i):
     if i == 0:
         return "Count"
     count = 0
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
             count += 1
     return count
 
 
-def ft_mean(data, i):
+def ft_mean(df, i):
     if i == 0:
         return "Mean"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     sum = 0
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
-            sum += float(data[j, i - 1])
-    return sum / ft_count(data, i)
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
+            sum += df[j, i - 1]
+    return sum / ft_count(df, i)
 
 
 def ft_sqrt(nb):
@@ -75,40 +76,40 @@ def ft_sqrt(nb):
     return a
 
 
-def ft_std(data, i):
+def ft_std(df, i):
     if i == 0:
         return "Std"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     std = 0
-    m = ft_mean(data, i)
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
-            std += (float(data[j, i - 1]) - m) * (float(data[j, i - 1]) - m)
-    return ft_sqrt(std / (ft_count(data, i) - 1))
+    m = ft_mean(df, i)
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
+            std += (df[j, i - 1] - m) * (df[j, i - 1] - m)
+    return ft_sqrt(std / (ft_count(df, i) - 1))
 
 
-def ft_min(data, i):
+def ft_min(df, i):
     if i == 0:
         return "Min"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     min = float("inf")
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "" and float(data[j, i - 1]) < min:
-            min = float(data[j, i - 1])
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]) and df[j, i - 1] < min:
+            min = df[j, i - 1]
     return min
 
 
-def ft_firstQuartile(data, i):
+def ft_firstQuartile(df, i):
     if i == 0:
         return "25%"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     tab = []
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
-            tab.append(float(data[j, i - 1]))
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
+            tab.append(df[j, i - 1])
     tab.sort()
     quarter = (len(tab) - 1) / 4
     down = np.floor(quarter)
@@ -118,15 +119,15 @@ def ft_firstQuartile(data, i):
     return tab[int(down)] * (up - quarter) + tab[int(up)] * (quarter - down)
 
 
-def ft_median(data, i):
+def ft_median(df, i):
     if i == 0:
         return "50%"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     tab = []
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
-            tab.append(float(data[j, i - 1]))
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
+            tab.append(df[j, i - 1])
     tab.sort()
     half = int(len(tab) / 2)
     if len(tab) % 2 != 0:
@@ -134,15 +135,15 @@ def ft_median(data, i):
     return (tab[half - 1] + tab[half]) / 2
 
 
-def ft_thirdQuartile(data, i):
+def ft_thirdQuartile(df, i):
     if i == 0:
         return "75%"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     tab = []
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "":
-            tab.append(float(data[j, i - 1]))
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]):
+            tab.append(df[j, i - 1])
     tab.sort()
     quarter = ((len(tab) - 1) / 4) * 3
     down = np.floor(quarter)
@@ -152,39 +153,44 @@ def ft_thirdQuartile(data, i):
     return tab[int(down)] * (up - quarter) + tab[int(up)] * (quarter - down)
 
 
-def ft_max(data, i):
+def ft_max(df, i):
     if i == 0:
         return "Max"
-    if ft_count(data, i) == 0:
+    if ft_count(df, i) == 0:
         return "NaN"
     max = float("-inf")
-    for j in range(1, len(data)):
-        if data[j, i - 1] != "" and float(data[j, i - 1]) > max:
-            max = float(data[j, i - 1])
+    for j in range(len(df)):
+        if not np.isnan(df[j, i - 1]) and df[j, i - 1] > max:
+            max = df[j, i - 1]
     return max
 
 
-def delCoLette(data, i):
-    for j in range(1, len(data)):
-        if (
-            data[j, i] != ""
-            and re.search("^[+-]?([0-9]+[.])?[0-9]+$", data[j, i]) == None
-        ):
-            return [np.delete(data, i, 1), i]
-    return [data, i + 1]
+def parse():
+    parse = argparse.ArgumentParser(
+        description="Descriptive statistics include those that summarize the central tendency, dispersion and shape of a dataset’s distribution, excluding NaN values.",
+    )
+    parse.add_argument(
+        "-d",
+        "--describe",
+        action="store_true",
+        help="display also describe from pandas",
+    )
+    parse.add_argument("dataset.csv", help="data to analyse")
+    args = parse.parse_args()
+    try:
+        df = pd.read_csv(sys.argv[1])
+    except:
+        sys.exit("Error")
+    df = df.select_dtypes(exclude=[object])
+    if df.empty:
+        sys.exit("Error")
+    if args.describe == True:
+        print("Pandas describe\n", df.describe(), "\nMy describe")
+    return df
 
 
 if __name__ == "__main__":
-    try:
-        if os.stat(sys.argv[1]).st_size > 0:
-            data = np.loadtxt(sys.argv[1], dtype=str, delimiter=",")
-        else:
-            sys.exit("Error")
-    except:
-        sys.exit("Error")
-    i = 0
-    while i < len(data[0]):
-        [data, i] = delCoLette(data, i)
+    df = parse()
     options = {
         1: ft_count,
         2: ft_mean,
@@ -195,11 +201,12 @@ if __name__ == "__main__":
         7: ft_thirdQuartile,
         8: ft_max,
     }
-    describe = np.zeros([len(options) + 1, len(data[0]) + 1], dtype="<U1000")
-    describe[0, 1:] = data[0]
+    describe = np.zeros([len(options) + 1, len(np.array(df)[0]) + 1], dtype="<U1000")
+    describe[0, 1:] = np.array(df.columns, dtype="<U1000")
     printLen = np.zeros(len(describe[0]), dtype="<U1000")
+    df = np.array(df)
     for i in range(len(describe[0])):
         for j in range(1, len(describe)):
-            describe[j, i] = options[j](data, i)
+            describe[j, i] = options[j](df, i)
         printLen[i] = maxLen(describe, i)
     printDescribe(describe, printLen)
