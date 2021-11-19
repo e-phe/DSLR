@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.8
 # -*- coding: utf-8 -*-
 
+import argparse
 import numpy as np
 import pandas as pd
-import re
 import sys
 
 
@@ -41,14 +41,25 @@ def predict(df, theta):
     return houses
 
 
-if __name__ == "__main__":
+def parse():
+    parser = argparse.ArgumentParser(
+        description="",
+    )
+    parser.add_argument("dataset_test.csv", help="testing dataset")
+    parser.add_argument("theta.csv", help="weight to make the prediction")
+    args = parser.parse_args()
     try:
         df = pd.read_csv(sys.argv[1], index_col="Index")
         theta = pd.read_csv(sys.argv[2])
     except:
         sys.exit("Error")
-    if not len(df) or not len(theta):
+    if df.empty or theta.empty:
         sys.exit("Error")
+    return [df, theta]
+
+
+if __name__ == "__main__":
+    [df, theta] = parse()
     houses = predict(df.iloc[:, 5:], theta)
     houses = pd.DataFrame(houses, columns=["Hogwarts House"])
     houses.index.name = "Index"
