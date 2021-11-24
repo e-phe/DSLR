@@ -27,9 +27,9 @@ def gradientDescent(X, y, theta, args):
     alpha = 0.1
     m = len(y)
     for i in range(0, 20000):
-        z = np.nansum(X * theta)
+        z = np.dot(X, theta)
         h = sigmoid(z)
-        gradient = np.nansum(np.transpose(X) * (h - y))
+        gradient = np.dot(np.transpose(X), (h - y))
         theta -= (alpha / m) * gradient
     if args.precision == True:
         costFunction(h, y)
@@ -93,6 +93,7 @@ if __name__ == "__main__":
         df = pd.read_csv(sys.argv[1], index_col="Index")
     except:
         sys.exit("Error")
+    df = df.dropna()
     house = np.array(df.loc[:, "Hogwarts House"])
     df = df.select_dtypes(exclude=[object])
     if df.empty:
