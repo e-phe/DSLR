@@ -31,12 +31,11 @@ def standardization(data):
 
 
 def predict(df, theta):
-    df = df.dropna()
     df = np.apply_along_axis(standardization, 0, np.array(df))
     houses = []
     for i in df:
         houses.append(
-            max((np.dot(i, np.array(theta[house])), house) for house in theta)[1]
+            max((np.nansum(i * np.array(theta[house])), house) for house in theta)[1]
         )
     return houses
 

@@ -27,9 +27,9 @@ def gradientDescent(X, y, theta, args):
     alpha = 0.1
     m = len(y)
     for i in range(0, 20000):
-        z = np.dot(X, theta)
+        z = np.nansum(X * theta)
         h = sigmoid(z)
-        gradient = np.dot(np.transpose(X), (h - y))
+        gradient = np.nansum(np.transpose(X) * (h - y))
         theta -= (alpha / m) * gradient
     if args.precision == True:
         costFunction(h, y)
@@ -48,15 +48,15 @@ def sqrt(nb):
     return a
 
 
-def standardization(data):
-    mean = sum(data) / len(data)
+def standardization(df):
+    mean = sum(df) / len(df)
     std = 0
-    for number in data:
+    for number in df:
         std += (number - mean) * (number - mean)
-    std = sqrt(std / len(data))
-    for i in range(len(data)):
-        data[i] = (data[i] - mean) / std
-    return data
+    std = sqrt(std / len(df))
+    for i in range(len(df)):
+        df[i] = (df[i] - mean) / std
+    return df
 
 
 def fit(X, y, args):
@@ -93,7 +93,6 @@ if __name__ == "__main__":
         df = pd.read_csv(sys.argv[1], index_col="Index")
     except:
         sys.exit("Error")
-    df = df.dropna()
     house = np.array(df.loc[:, "Hogwarts House"])
     df = df.select_dtypes(exclude=[object])
     if df.empty:
