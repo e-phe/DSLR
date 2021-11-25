@@ -48,15 +48,15 @@ def sqrt(nb):
     return a
 
 
-def standardization(df):
-    mean = sum(df) / len(df)
+def standardization(X):
+    mean = sum(X) / len(X)
     std = 0
-    for number in df:
+    for number in X:
         std += (number - mean) * (number - mean)
-    std = sqrt(std / len(df))
-    for i in range(len(df)):
-        df[i] = (df[i] - mean) / std
-    return df
+    std = sqrt(std / len(X))
+    for i in range(len(X)):
+        X[i] = (X[i] - mean) / std
+    return X
 
 
 def fit(X, y, args):
@@ -93,10 +93,15 @@ if __name__ == "__main__":
         df = pd.read_csv(sys.argv[1], index_col="Index")
     except:
         sys.exit("Error")
-    df = df.dropna()
-    house = np.array(df.loc[:, "Hogwarts House"])
-    df = df.select_dtypes(exclude=[object])
+    df = df.dropna(subset=["Astronomy"])
+    df = df.dropna(subset=["Herbology"])
+    df = df.dropna(subset=["Defense Against the Dark Arts"])
+    df = df.dropna(subset=["Ancient Runes"])
     if df.empty:
         sys.exit("Error")
-    theta = fit(np.array(df), house, args)
+    theta = fit(
+        np.array(df.values[:, [6, 7, 8, 11]], dtype=float),
+        np.array(df.loc[:, "Hogwarts House"]),
+        args,
+    )
     pd.DataFrame(theta).to_csv("theta.csv", index=False)

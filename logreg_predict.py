@@ -31,11 +31,11 @@ def standardization(data):
 
 
 def predict(df, theta):
-    df = np.apply_along_axis(standardization, 0, np.array(df))
+    df = np.apply_along_axis(standardization, 0, df)
     houses = []
     for i in df:
         houses.append(
-            max((np.nansum(i * np.array(theta[house])), house) for house in theta)[1]
+            max((np.dot(i, np.array(theta[house])), house) for house in theta)[1]
         )
     return houses
 
@@ -54,12 +54,13 @@ def parse():
         sys.exit("Error")
     if df.empty or theta.empty:
         sys.exit("Error")
+    df = df.fillna(method="ffill")
     return [df, theta]
 
 
 if __name__ == "__main__":
     [df, theta] = parse()
-    houses = predict(df.iloc[:, 5:], theta)
+    houses = predict(np.array(df.values[:, [6, 7, 8, 11]], dtype=float), theta)
     houses = pd.DataFrame(houses, columns=["Hogwarts House"])
     houses.index.name = "Index"
     houses.to_csv("houses.csv")
