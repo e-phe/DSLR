@@ -65,10 +65,9 @@ def fit(X, y, args):
     for i in np.unique(y):
         if args.precision == True:
             print(i)
-        tmpTheta = gradientDescent(
+        theta[i] = gradientDescent(
             X, np.where(y == i, 1, 0), np.zeros(X.shape[1]), args
         )
-        theta[i] = tmpTheta
     return theta
 
 
