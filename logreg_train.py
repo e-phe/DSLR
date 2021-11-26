@@ -104,4 +104,4 @@ if __name__ == "__main__":
         np.array(df.loc[:, "Hogwarts House"]),
         args,
     )
-    pd.DataFrame(theta).to_csv("theta.csv", index=False)
+    pd.DataFrame(theta).to_csv("weights.csv", index=False)
