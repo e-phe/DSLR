@@ -16,7 +16,7 @@ def costFunction(h, y):
         )
         / m
     )
-    print("The precision is " + str(cost))
+    print("The cost is " + str(cost))
 
 
 def sigmoid(x):
@@ -26,12 +26,12 @@ def sigmoid(x):
 def gradientDescent(X, y, theta, args):
     alpha = 0.1
     m = len(y)
-    for i in range(0, 20000):
+    for i in range(0, 3):
         z = np.dot(X, theta)
         h = sigmoid(z)
         gradient = np.dot(np.transpose(X), (h - y))
         theta -= (alpha / m) * gradient
-    if args.precision == True:
+    if args.cost == True:
         costFunction(h, y)
     return theta
 
@@ -63,7 +63,7 @@ def fit(X, y, args):
     np.apply_along_axis(standardization, 0, X)
     theta = {}
     for i in np.unique(y):
-        if args.precision == True:
+        if args.cost == True:
             print(i)
         theta[i] = gradientDescent(
             X, np.where(y == i, 1, 0), np.zeros(X.shape[1]), args
@@ -77,10 +77,10 @@ def parse():
     )
     parser.add_argument("dataset_train.csv", help="training dataset")
     parser.add_argument(
-        "-p",
-        "--precision",
+        "-c",
+        "--cost",
         action="store_true",
-        help="displays the precision of the algorithm.",
+        help="displays the cost of the algorithm.",
     )
     args = parser.parse_args()
     return args
